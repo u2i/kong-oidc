@@ -19,13 +19,6 @@
 
   (set -x
     docker-compose -f ${INTEGRATION_PATH}/docker-compose.yml run --rm kong kong migrations bootstrap
-    docker-compose -f ${INTEGRATION_PATH}/docker-compose.yml up -d
-  )
-
-  _wait_for_endpoint http://localhost:${KONG_HTTP_ADMIN_PORT}
-  _wait_for_endpoint http://localhost:${KEYCLOAK_PORT}
-
-  (set -x
-    python3 ${INTEGRATION_PATH}/setup.py
+    docker-compose -f ${INTEGRATION_PATH}/docker-compose.yml up
   )
 )
