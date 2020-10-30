@@ -12,6 +12,7 @@ description = {
 }
 dependencies = {
     "lua-resty-session >= 2.8",
+    "lua-resty-redis-connector >= 0.10"
 }
 build = {
     type = "builtin",
