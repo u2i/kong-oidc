@@ -52,13 +52,26 @@ end
 
 function make_oidc(oidcConfig)
   ngx.log(ngx.DEBUG, "OidcHandler calling authenticate, requested path: " .. ngx.var.request_uri)
-  local res, err = require("resty.openidc").authenticate(oidcConfig)
+  
+  local no_auth_redirects = kong.request.get_header('X-no-auth-redirects')
+  local target_url = kong.request.get_header('X-Overwrite-Target-Url')
+  kong.log.debug("overwrite" .. (target_url or "n/a"))
+
+  local res, err = require("resty.openidc").authenticate(oidcConfig, target_url, no_auth_redirects == "deny" and "deny" or nil)
+  
+  kong.log.debug("!!!!! Authentication is required - Redirecting to OP Authorization endpoint")
+  kong.log.debug(res, err)
+
   if err then
-    if oidcConfig.recovery_page_path then
-      ngx.log(ngx.DEBUG, "Entering recovery page: " .. oidcConfig.recovery_page_path)
-      ngx.redirect(oidcConfig.recovery_page_path)
+    if err == "unauthorized request" then
+      return ngx.exit(403)
+    else
+      if oidcConfig.recovery_page_path then
+        ngx.log(ngx.DEBUG, "Entering recovery page: " .. oidcConfig.recovery_page_path)
+        ngx.redirect(oidcConfig.recovery_page_path)
+      end
+      utils.exit(500, err, ngx.HTTP_INTERNAL_SERVER_ERROR)
     end
-    utils.exit(500, err, ngx.HTTP_INTERNAL_SERVER_ERROR)
   end
   return res
 end
