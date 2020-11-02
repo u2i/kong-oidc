@@ -26,7 +26,7 @@ RUN luarocks install --only-deps ${KONG_PLUGINS_DIR}/kong-oidc/*.rockspec
 COPY --chown=kong:root ./session-invalidate/*.rockspec ${KONG_PLUGINS_DIR}/session-invalidate/
 RUN luarocks install --only-deps ${KONG_PLUGINS_DIR}/session-invalidate/*.rockspec
 
-COPY --chown=kong:root kong-oidc ${KONG_PLUGINS_DIR}/oidc
+COPY --chown=kong:root kong-oidc ${KONG_PLUGINS_DIR}/kong-oidc
 COPY --chown=kong:root session-invalidate ${KONG_PLUGINS_DIR}/session-invalidate
 
 USER kong

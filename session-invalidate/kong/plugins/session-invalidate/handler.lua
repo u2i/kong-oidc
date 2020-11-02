@@ -35,9 +35,20 @@ end --]]
 function SessionInvalidate:access(config)
   local s = session.start()
   -- ngx.log(ngx.WARN, debug.table_to_string(s.data))
-  ngx.log(ngx.WARN, "access")
-  s.data.test = 'deleteme'
-  s:save()
+  ngx.log(ngx.WARN, "================================================")
+  ngx.log(ngx.WARN, s.data.original_url)
+  ngx.log(ngx.WARN, kong.request.get_query_arg("redirect_url"))
+  ngx.log(ngx.DEBUG, "hello world!")
+  kong.log.debug("kong log")
+  local redirect_url = kong.request.get_query_arg("redirect_url")
+
+  if redirect_url then
+    ngx.log(ngx.WARN, "set original_url")
+    s.data.original_url = redirect_url
+    s:save()
+  else
+    s:close()
+  end
 end
 
 return SessionInvalidate
