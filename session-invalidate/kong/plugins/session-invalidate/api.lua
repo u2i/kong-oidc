@@ -74,5 +74,24 @@ return {
         end
       )
     end
+  },
+  ["/sub/:sub/sessions"] = {
+    DELETE = function(self)
+      with_redis(
+        function(connection)
+          local sub = self.params.sub
+          local sessions, err = connection:lrange("user_sessions:" .. sub, 0, -1)
+          
+          for _, session_id in pairs(sessions) do
+            -- TODO: should we use one request?
+            connection:del("sessions:" .. session_id)
+          end
+
+          connection:del("user_sessions:" .. sub)
+        end,
+        function()
+        end
+      )
+    end
   }
 }
